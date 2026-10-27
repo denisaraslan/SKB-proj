@@ -1,0 +1,40 @@
+<!-- Шаблон навайбкожен  -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пользователи (debug)</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px auto; max-width: 1000px; padding: 0 16px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    code { font-size: 12px; color: #555; }
+    .warn { background: #fff4e5; padding: 10px; border-radius: 4px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Пользователи в системе: {{ users|length }}</h1>
+  <p class="warn">Страница для разработки. Работает только при DEBUG=True. Данные хранятся в памяти и пропадают при перезапуске сервера.</p>
+
+  <button onclick="location.reload()">Обновить</button>
+
+  <table>
+    <tr>
+      <th>ID</th><th>Email</th><th>Имя</th><th>Роль</th><th>Создан</th><th>Хеш пароля</th>
+    </tr>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.id }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.name }}</td>
+      <td>{{ u.role }}</td>
+      <td>{{ u.created_at|date:"d.m.Y H:i:s" }}</td>
+      <td><code>{{ u.hash_preview }}</code></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">Пользователей пока нет</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!-- нейронка писала, так чисто хабстраница -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Главная</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      justify-content: center;   /* по горизонтали */
+      align-items: center;       /* по вертикали */
+      font-family: sans-serif;
+    }
+    .menu { display: flex; flex-direction: column; gap: 16px; width: 280px; }
+    .btn {
+      display: block;
+      padding: 14px;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      background: #2563eb;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn.secondary { background: #6b7280; }
+    .btn.secondary:hover { background: #4b5563; }
+  </style>
+</head>
+<body>
+  <div class="menu">
+    <a class="btn" href="/register">Зарегистрироваться</a>
+    <a class="btn secondary" href="/debug/users/">Дебаг-меню</a>
+  </div>
+</body>
+</html>
