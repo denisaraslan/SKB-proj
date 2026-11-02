@@ -137,4 +137,5 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["accounts.auth.SessionUserAuthentication"],
     "UNAUTHENTICATED_USER": None,
+    "EXCEPTION_HANDLER": "accounts.exc_handler.app_exception_handler",
 }

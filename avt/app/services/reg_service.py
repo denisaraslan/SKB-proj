@@ -3,14 +3,7 @@ from datetime import datetime
 from app.entities.user import UserEntity, UserRole
 from app.repositories.inmemory.user_rep import InMemoryUserRepository
 from app.security import hash_password, verify_password
-
-#потом
-class EmailAlreadyRegistered(Exception):
-    pass
-
-#потом
-class InvalidCredentials(Exception):
-    pass
+from app.exc import EmailAlreadyRegistered, InvalidCredentials
 
 class AuthService:
     def __init__(self, users:InMemoryUserRepository):

@@ -7,7 +7,6 @@ class UserRole(str, Enum):
     TEACHER = "teacher"
     STUDENT = "student"
     ADMIN = "admin"
-    DATA_ENGINEER = "data_engineer"
 
 
 @dataclass

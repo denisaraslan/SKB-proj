@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 
 from app.container import auth_service, user_repo
 from app.entities.user import UserRole
-from app.services.reg_service import EmailAlreadyRegistered, InvalidCredentials
 
 from .auth import role_required
 from .serializers import LoginSerializer, RegisterSerializer
@@ -25,25 +24,16 @@ def user_to_dict(user):
 class RegisterView(APIView):
     def post(self, request):
         s = RegisterSerializer(data=request.data)
-        s.is_valid(raise_exception=True)      # при ошибке сам вернёт 400
-        try:
-            user = auth_service.register(**s.validated_data)
-        except EmailAlreadyRegistered:
-            return Response({"detail": "Этот email уже зарегистрирован"},
-                            status=status.HTTP_409_CONFLICT)
+        s.is_valid(raise_exception=True)
+        user = auth_service.register(**s.validated_data)
         return Response(user_to_dict(user), status=status.HTTP_201_CREATED)
-
 
 class LoginView(APIView):
     def post(self, request):
         s = LoginSerializer(data=request.data)
         s.is_valid(raise_exception=True)
-        try:
-            user = auth_service.login(**s.validated_data)
-        except InvalidCredentials:
-            return Response({"detail": "Неверный email или пароль"},
-                            status=status.HTTP_401_UNAUTHORIZED)
-        request.session["user_id"] = user.id   # запоминаем пользователя
+        user = auth_service.login(**s.validated_data)
+        request.session["user_id"] = user.id
         return Response(user_to_dict(user))
 
 
@@ -65,8 +55,3 @@ class AdminUsersView(APIView):
 
     def get(self, request):
         return Response([user_to_dict(u) for u in user_repo.list_all()])
-
-
-
-# статус-коды: 201 создано, 400 неверные данные, 401 неверный логин или пароль,
-# 403 нет прав, 409 конфликт (email занят), 204 успех без тела
