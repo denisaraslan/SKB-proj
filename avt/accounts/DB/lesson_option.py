@@ -13,10 +13,6 @@ class StepType(models.TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     FILL_IN_THE_BLANK = "fill_in_the_blank"
 
-class ProgressStatus(models.TextChoices):
-    NOT_STARTED = "not_started"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
 
 
 class Course(models.Model):

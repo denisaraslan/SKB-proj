@@ -6,6 +6,11 @@ class UserRole(models.TextChoices):
     TEACHER = "teacher"
     ADMIN = "admin"
 
+class ProgressStatus(models.TextChoices):
+    NOT_STARTED = "not_started"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+
 class User(models.Model):
     email = models.EmailField(unique=True, max_length=255)
     hashed_password = models.CharField(max_length=255)
