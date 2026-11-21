@@ -1,5 +1,8 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import BaseUserManager
+from app.DB.lesson_option import Course, Module
 
 class UserRole(models.TextChoices):
     STUDENT = "student"
@@ -11,12 +14,27 @@ class ProgressStatus(models.TextChoices):
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
 
+class UserManager(BaseUserManager):
+    def create_user(self, email: str, password: str, user_name: str, role: str):
+        email = self.normalize_email(email)
+        user = self.model(
+            email=email,
+            hashed_password=make_password(password),
+            user_name=user_name,
+            role=role,
+        )
+        user.save(using=self._db)
+        return user
+
 class User(models.Model):
     email = models.EmailField(unique=True, max_length=255)
+    user_name = models.CharField(max_length=100)
+    role = models.CharField(choices=UserRole.choices, default=UserRole.STUDENT)
     hashed_password = models.CharField(max_length=255)
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
-    role = models.CharField(choices=UserRole.choices, default=UserRole.STUDENT)
+
+    objects = UserManager()
     def __str__(self):
         return self.email
 

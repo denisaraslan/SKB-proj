@@ -13,8 +13,6 @@ class StepType(models.TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     FILL_IN_THE_BLANK = "fill_in_the_blank"
 
-
-
 class Course(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -47,9 +45,6 @@ class Step(models.Model):
     type = models.CharField(choices=StepType.choices)
     lesson = models.ForeignKey('Lesson', on_delete=models.CASCADE, related_name='step')
 
-    # constraints = [
-    #     models.UniqueConstraint(fields=["order", "lesson"], name="uq_lessons_step")
-    # ]
 
     def __str__(self):
         return f'Step_{self.order}_Lesson_{self.lesson}'
