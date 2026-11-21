@@ -6,7 +6,7 @@ from app.container import auth_service, user_repo
 from app.entities.user import UserRole
 
 from .auth import role_required
-from .serializers import LoginSerializer, RegisterSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserOutputSerializer
 
 ANY_ROLE = role_required(UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN)
 
@@ -26,7 +26,7 @@ class RegisterView(APIView):
         s = RegisterSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         user = auth_service.register(**s.validated_data)
-        return Response(user_to_dict(user), status=status.HTTP_201_CREATED)
+        return Response(UserOutputSerializer(user).data, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
     def post(self, request):

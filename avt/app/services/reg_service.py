@@ -1,32 +1,61 @@
-from datetime import datetime
+from django.http import JsonResponse
+from rest_framework.response import Response
 
-from app.entities.user import UserEntity, UserRole
-from app.repositories.inmemory.user_rep import InMemoryUserRepository
-from app.security import hash_password, verify_password
+from accounts.DB.users_option import UserRole, User
+from app.entities.user import UserEntity
+from app.security import verify_password
 from app.exc import EmailAlreadyRegistered, InvalidCredentials
+from accounts.DB.repositories.user_rep import UserRepository
+# class AuthService:
+#
+#
+#     def __init__(self, users:InMemoryUserRepository):
+#         self.users = users
+#
+#     def create_user(self, email:str, name:str, password:str, role: UserRole) -> UserEntity:
+#         email = email.lower().strip()
+#
+#         if self.users.get_by_email(email):
+#             raise EmailAlreadyRegistered()
+#
+#         user = UserEntity(
+#             id=0,  # тут 0 ибо настоящий id выдаст репозиторий когда его сохранит
+#             email=email,
+#             name=name,
+#             role=role,
+#             hashed_password=hash_password(password),
+#             created_at=datetime.now(),
+#         )
+#
+#         return self.users.add(user)
+#
+#     def register(self, email:str, name:str, password:str):
+#         # Публичная регистрация всегда создаёт ученика
+#         return self.create_user(email, name, password, UserRole.STUDENT)
+#
+#     def login(self, email: str, password: str) -> UserEntity:
+#         user = self.users.get_by_email(email.strip())
+#         if user is None or not verify_password(password, user.hashed_password):
+#             raise InvalidCredentials()
+#         return user
 
 class AuthService:
-    def __init__(self, users:InMemoryUserRepository):
+    def __init__(self, users: UserRepository):
         self.users = users
 
-    def create_user(self, email:str, name:str, password:str, role: UserRole) -> UserEntity:
-        email = email.lower().strip()
-
+    def create_user(self, email: str, user_name: str, password: str, role: str) -> User:
         if self.users.get_by_email(email):
             raise EmailAlreadyRegistered()
 
-        user = UserEntity(
-            id=0,  # тут 0 ибо настоящий id выдаст репозиторий когда его сохранит
+        user = self.users.create_user(
             email=email,
-            name=name,
-            role=role,
-            hashed_password=hash_password(password),
-            created_at=datetime.now(),
+            password=password,
+            user_name=user_name,
+            role=role
         )
+        return user
 
-        return self.users.add(user)
-
-    def register(self, email:str, name:str, password:str):
+    def register(self, email: str, name: str, password: str) -> User:
         # Публичная регистрация всегда создаёт ученика
         return self.create_user(email, name, password, UserRole.STUDENT)
 
@@ -35,4 +64,3 @@ class AuthService:
         if user is None or not verify_password(password, user.hashed_password):
             raise InvalidCredentials()
         return user
-
