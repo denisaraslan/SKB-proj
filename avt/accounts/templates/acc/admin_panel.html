@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Админ-панель</title>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 30px auto; padding: 0 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    #message { margin: 12px 0; color: #9b1c1c; min-height: 1.2em; }
+    form input, form select { margin-right: 6px; padding: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Админ-панель</h1>
+  <p>Вы вошли как {{ admin_email }} <button id="logout">Выйти</button></p>
+  <p id="message"></p>
+
+  <h2>Создать пользователя</h2>
+  <form id="create-form">
+    <input id="c-name" placeholder="Имя" required>
+    <input id="c-email" type="email" placeholder="Email" required>
+    <input id="c-password" type="password" placeholder="Пароль" required>
+    <select id="c-role">
+      <option value="student">student</option>
+      <option value="teacher">teacher</option>
+      <option value="admin">admin</option>
+    </select>
+    <button type="submit">Создать</button>
+  </form>
+
+  <h2>Пользователи</h2>
+  <table id="users">
+    <thead><tr><th>ID</th><th>Email</th><th>Имя</th><th>Роль</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const ROLES = ["student", "teacher", "admin"];
+    const msg = document.getElementById("message");
+
+    function getCookie(name) {
+      const row = document.cookie.split("; ").find(r => r.startsWith(name + "="));
+      return row ? row.split("=")[1] : "";
+    }
+
+    async function api(method, url, body) {
+      const options = { method: method, headers: { "X-CSRFToken": getCookie("csrftoken") } };
+      if (body) {
+        options.headers["Content-Type"] = "application/json";
+        options.body = JSON.stringify(body);
+      }
+      const res = await fetch(url, options);
+      const data = res.status === 204 ? null : await res.json();
+      if (!res.ok) throw new Error(data.detail || Object.values(data).flat().join(" "));
+      return data;
+    }
+
+    function showError(e) { msg.textContent = e.message; }
+
+    async function loadUsers() {
+      const users = await api("GET", "/api/admin/users/");
+      const tbody = document.querySelector("#users tbody");
+      tbody.replaceChildren();
+      for (const u of users) {
+        const tr = tbody.insertRow();
+        for (const value of [u.id, u.email, u.user_name]) {
+          tr.insertCell().textContent = value;        // textContent, не innerHTML!
+        }
+        const select = document.createElement("select");
+        for (const r of ROLES) select.add(new Option(r, r));
+        select.value = u.role;
+        select.onchange = async () => {
+          try {
+            await api("PATCH", "/api/admin/users/" + u.id + "/", { role: select.value });
+            msg.textContent = "";
+          } catch (e) { showError(e); loadUsers(); }
+        };
+        tr.insertCell().append(select);
+
+        const del = document.createElement("button");
+        del.textContent = "Удалить";
+        del.onclick = async () => {
+          if (!confirm("Удалить " + u.email + "?")) return;
+          try { await api("DELETE", "/api/admin/users/" + u.id + "/"); loadUsers(); }
+          catch (e) { showError(e); }
+        };
+        tr.insertCell().append(del);
+      }
+    }
+
+    document.getElementById("create-form").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const btn = ev.submitter;
+      btn.disabled = true;
+      try {
+        await api("POST", "/api/admin/users/", {
+          name: document.getElementById("c-name").value,
+          email: document.getElementById("c-email").value,
+          password: document.getElementById("c-password").value,
+          role: document.getElementById("c-role").value,
+        });
+        ev.target.reset();
+        msg.textContent = "";
+        await loadUsers();
+      } catch (e) { showError(e); }
+      finally { btn.disabled = false; }
+    });
+
+    document.getElementById("logout").onclick = async () => {
+      await api("POST", "/api/logout/");
+      window.location.href = "/login";
+    };
+
+    loadUsers().catch(showError);
+  </script>
+</body>
+</html>

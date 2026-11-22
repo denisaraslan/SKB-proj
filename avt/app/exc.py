@@ -67,3 +67,7 @@ class UserNotFound(NotFoundError):
 
 class WeakPassword(BadRequestError):
     default_message = "Пароль слишком простой"
+
+
+class CannotModifySelf(PermissionDeniedError):
+    default_message = "Нельзя изменить или удалить самого себя"
