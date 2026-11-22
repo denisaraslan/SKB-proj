@@ -14,9 +14,9 @@ def debug_users(request):
         {
             "id": u.id,
             "email": u.email,
-            "name": u.name,
-            "role": u.role.value,
-            "created_at": u.created_at,
+            "name": u.user_name,
+            "role": u.role,
+            "created_at": u.time_create,
             # Показываем только начало хеша, чтобы видно было: пароль хранится в виде хеша
             "hash_preview": u.hashed_password[:30] + "…",
         }

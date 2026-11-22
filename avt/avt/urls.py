@@ -19,6 +19,7 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from accounts.debug_views import debug_users
+from accounts.panel_views import admin_panel
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="acc/home.html")),
@@ -26,5 +27,7 @@ urlpatterns = [
     path("api/", include("accounts.urls")),
     path("register", TemplateView.as_view(template_name="acc/register.html")),
     path("debug/users/", debug_users),
+    path("login", TemplateView.as_view(template_name="acc/login.html")),
+    path("admin-panel", admin_panel),
 
 ]

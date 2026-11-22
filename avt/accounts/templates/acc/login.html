@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Вход</title></head>
+<body>
+  <h1>Вход</h1>
+  <form id="login-form">
+    <input id="email" type="email" placeholder="Email" required>
+    <input id="password" type="password" placeholder="Пароль" required>
+    <button type="submit">Войти</button>
+  </form>
+  <p id="message"></p>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const res = await fetch("/api/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = data.role === "admin" ? "/admin-panel" : "/";
+      } else {
+        document.getElementById("message").textContent =
+          data.detail || Object.values(data).flat().join(" ");
+      }
+    });
+  </script>
+</body>
+</html>
